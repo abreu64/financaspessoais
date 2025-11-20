@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanças Pessoais</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-wallet2"></i> Finanças Pessoais
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="dashboard">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="entradas">
+                            <i class="bi bi-arrow-down-circle"></i> Entradas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="despesas">
+                            <i class="bi bi-arrow-up-circle"></i> Despesas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="cartoes">
+                            <i class="bi bi-credit-card"></i> Cartões
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="extrato" style="display: none;" id="navExtrato">
+                            <i class="bi bi-receipt"></i> Extrato
+                        </a>
+                    </li>
+                </ul>
+                <div class="navbar-nav">
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                        <label class="form-check-label text-light" for="darkModeToggle">Modo Escuro</label>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> Usuário
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Configurações</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container mt-4">
+        <!-- Página de Login -->
+        <div id="login-page" class="page active">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-body p-5">
+                            <h3 class="card-title text-center mb-4">
+                                <i class="bi bi-wallet2 text-primary"></i><br>
+                                Finanças Pessoais
+                            </h3>
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <a href="#" id="criarContaLink" class="text-primary">Criar nova conta</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Páginas do Sistema -->
+        <div id="app-pages" class="d-none">
+            <!-- Dashboard -->
+            <div id="dashboard-page" class="page">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-secondary" onclick="Dashboard.limparFiltros()">
+                                    <i class="bi bi-arrow-clockwise"></i> Limpar
+                                </button>
+                                <button class="btn btn-primary" onclick="Dashboard.aplicarFiltros()">
+                                    <i class="bi bi-funnel"></i> Aplicar Filtros
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-muted">Visão geral das suas finanças</p>
+                    </div>
+                </div>
+
+                <!-- Filtros do Dashboard -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Período</label>
+                        <select class="form-select" id="filtroPeriodoDashboard">
+                            <option value="hoje">Hoje</option>
+                            <option value="semana">Esta Semana</option>
+                            <option value="mes" selected>Este Mês</option>
+                            <option value="ano">Este Ano</option>
+                            <option value="personalizado">Personalizado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Data Início</label>
+                        <input type="date" class="form-control" id="filtroDataInicioDashboard">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" class="form-control" id="filtroDataFimDashboard">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo de Visualização</label>
+                        <select class="form-select" id="filtroVisualizacaoDashboard">
+                            <option value="resumo" selected>Resumo</option>
+                            <option value="detalhado">Detalhado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Cards de Resumo -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 id="total-entradas">R$ 0,00</h4>
+                                        <p>Entradas</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="bi bi-arrow-down-circle display-6"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 id="total-despesas">R$ 0,00</h4>
+                                        <p>Despesas</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="bi bi-arrow-up-circle display-6"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 id="saldo-total">R$ 0,00</h4>
+                                        <p>Saldo</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="bi bi-wallet2 display-6"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Entradas por Tipo</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="graficoEntradas" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Despesas por Tipo</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="graficoDespesas" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela Detalhada (Opcional) -->
+                <div class="row mt-4 d-none" id="tabelaDetalhadaDashboard">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-list"></i> Detalhamento</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Tipo</th>
+                                                <th>Descrição</th>
+                                                <th>Valor</th>
+                                                <th>Categoria</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabelaDetalhadaConteudo">
+                                            <!-- Dados carregados via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Entradas -->
+            <div id="entradas-page" class="page d-none">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2><i class="bi bi-arrow-down-circle"></i> Entradas</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEntrada">
+                                <i class="bi bi-plus-circle"></i> Nova Entrada
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Período</label>
+                        <select class="form-select" id="filtroPeriodoEntradas">
+                            <option value="hoje">Hoje</option>
+                            <option value="semana">Esta Semana</option>
+                            <option value="mes" selected>Este Mês</option>
+                            <option value="ano">Este Ano</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Data Início</label>
+                        <input type="date" class="form-control" id="filtroDataInicioEntradas">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" class="form-control" id="filtroDataFimEntradas">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-outline-secondary w-100" id="btnLimparFiltrosEntradas">
+                            <i class="bi bi-arrow-clockwise"></i> Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabela de Entradas -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Valor</th>
+                                        <th>Forma de Recebimento</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaEntradas">
+                                    <!-- Dados carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Despesas -->
+            <div id="despesas-page" class="page d-none">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2><i class="bi bi-arrow-up-circle"></i> Despesas</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalDespesa">
+                                <i class="bi bi-plus-circle"></i> Nova Despesa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Período</label>
+                        <select class="form-select" id="filtroPeriodoDespesas">
+                            <option value="hoje">Hoje</option>
+                            <option value="semana">Esta Semana</option>
+                            <option value="mes" selected>Este Mês</option>
+                            <option value="ano">Este Ano</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Data Início</label>
+                        <input type="date" class="form-control" id="filtroDataInicioDespesas">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" class="form-control" id="filtroDataFimDespesas">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-outline-secondary w-100" id="btnLimparFiltrosDespesas">
+                            <i class="bi bi-arrow-clockwise"></i> Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabela de Despesas -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Valor</th>
+                                        <th>Forma de Pagamento</th>
+                                        <th>Local</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaDespesas">
+                                    <!-- Dados carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Cartões -->
+            <div id="cartoes-page" class="page d-none">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2><i class="bi bi-credit-card"></i> Cartões</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCartao">
+                                <i class="bi bi-plus-circle"></i> Novo Cartão
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cards dos Cartões -->
+                <div class="row" id="listaCartoes">
+                    <!-- Cartões carregados via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Página de Extrato do Cartão -->
+            <div id="extrato-page" class="page d-none">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2><i class="bi bi-receipt"></i> Extrato</h2>
+                            <button class="btn btn-secondary" onclick="Extrato.voltarParaCartoes()">
+                                <i class="bi bi-arrow-left"></i> Voltar aos Cartões
+                            </button>
+                        </div>
+                        <p class="text-muted">Extrato detalhado do cartão selecionado</p>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Data Início</label>
+                        <input type="date" class="form-control" id="filtroDataInicioExtrato">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" class="form-control" id="filtroDataFimExtrato">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-outline-secondary w-100" id="btnLimparFiltrosExtrato">
+                            <i class="bi bi-arrow-clockwise"></i> Limpar Filtros
+                        </button>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-primary w-100" onclick="Extrato.aplicarFiltros()">
+                            <i class="bi bi-funnel"></i> Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resumo do Extrato -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div id="resumoExtrato">
+                            <!-- Resumo será carregado via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Extrato -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-list-check"></i> Parcelas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Vencimento</th>
+                                        <th>Descrição</th>
+                                        <th>Valor</th>
+                                        <th>Parcela</th>
+                                        <th>Status</th>
+                                        <th>Data Pagamento</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaExtrato">
+                                    <!-- Dados carregados via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Modal Entrada -->
+    <div class="modal fade" id="modalEntrada" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nova Entrada</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEntrada">
+                        <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" name="tipo" required>
+                                <option value="">Selecione...</option>
+                                <option value="salario">Salário</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="rendimentos">Rendimentos</option>
+                                <option value="poupanca">Poupança</option>
+                                <option value="extra">Trabalhos Extras</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Valor</label>
+                            <input type="number" class="form-control" name="valor" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data</label>
+                            <input type="date" class="form-control" name="data_entrada" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Forma de Recebimento</label>
+                            <select class="form-select" name="forma_recebimento" required>
+                                <option value="">Selecione...</option>
+                                <option value="dinheiro">Dinheiro</option>
+                                <option value="pix">PIX</option>
+                                <option value="transferencia">Transferência</option>
+                                <option value="cheque">Cheque</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição (Opcional)</label>
+                            <textarea class="form-control" name="descricao" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="salvarEntrada">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Despesa -->
+    <div class="modal fade" id="modalDespesa" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nova Despesa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formDespesa">
+                        <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" name="tipo" required>
+                                <option value="">Selecione...</option>
+                                <option value="compras">Compras</option>
+                                <option value="farmacia">Farmácia</option>
+                                <option value="educacao">Educação</option>
+                                <option value="lazer">Lazer</option>
+                                <option value="academia">Academia</option>
+                                <option value="transporte">Transporte</option>
+                                <option value="alimentacao">Alimentação</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Valor</label>
+                            <input type="number" class="form-control" name="valor" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Forma de Pagamento</label>
+                            <select class="form-select" name="tipo_pagamento" required>
+                                <option value="">Selecione...</option>
+                                <option value="credito">Cartão de Crédito</option>
+                                <option value="debito">Cartão de Débito</option>
+                                <option value="pix">PIX</option>
+                                <option value="dinheiro">Dinheiro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="campoCartao" style="display: none;">
+                            <label class="form-label">Cartão</label>
+                            <select class="form-select" name="cartao_id">
+                                <option value="">Selecione o cartão...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Parcelas</label>
+                            <input type="number" class="form-control" name="parcelas" value="1" min="1" max="12">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data</label>
+                            <input type="date" class="form-control" name="data_despesa" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Local (Opcional)</label>
+                            <input type="text" class="form-control" name="local">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição (Opcional)</label>
+                            <textarea class="form-control" name="descricao" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="salvarDespesa">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cartão -->
+    <div class="modal fade" id="modalCartao" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Cartão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCartao">
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Cartão</label>
+                            <input type="text" class="form-control" name="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bandeira</label>
+                            <select class="form-select" name="bandeira" required>
+                                <option value="">Selecione...</option>
+                                <option value="visa">Visa</option>
+                                <option value="mastercard">MasterCard</option>
+                                <option value="elo">Elo</option>
+                                <option value="american">American Express</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Limite</label>
+                            <input type="number" class="form-control" name="limite" step="0.01" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Dia de Fechamento</label>
+                                    <input type="number" class="form-control" name="data_fechamento" min="1" max="31" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Dia de Vencimento</label>
+                                    <input type="number" class="form-control" name="data_vencimento" min="1" max="31" required>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="salvarCartao">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/entradas.js"></script>
+    <script src="js/despesas.js"></script>
+    <script src="js/cartoes.js"></script>
+    <script src="js/extrato.js"></script>
+</body>
+</html>
