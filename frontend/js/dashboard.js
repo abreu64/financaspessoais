@@ -1,4 +1,4 @@
-// Gerenciamento do Dashboard
+// Gerenciamento do Dashboard - CORRIGIDO
 class Dashboard {
   static charts = {};
 
@@ -17,7 +17,8 @@ class Dashboard {
       if (dataInicio) queryString += `&data_inicio=${dataInicio}`;
       if (dataFim) queryString += `&data_fim=${dataFim}`;
       
-      const data = await Utils.apiCall(`/dashboard?${queryString}`);
+      // CORREÇÃO: Adicionar /api na URL
+      const data = await Utils.apiCall(`/api/dashboard?${queryString}`);
       console.log('Dados do dashboard:', data);
       this.updateCards(data);
       this.updateCharts(data);
@@ -223,10 +224,10 @@ class Dashboard {
       if (dataInicio) queryString += `&data_inicio=${dataInicio}`;
       if (dataFim) queryString += `&data_fim=${dataFim}`;
       
-      // Buscar entradas e despesas detalhadas
+      // CORREÇÕES: Adicionar /api nas URLs
       const [entradas, despesas] = await Promise.all([
-        Utils.apiCall(`/entradas?${queryString}`),
-        Utils.apiCall(`/despesas?${queryString}`)
+        Utils.apiCall(`/api/entradas?${queryString}`),
+        Utils.apiCall(`/api/despesas?${queryString}`)
       ]);
 
       this.renderTabelaDetalhada(entradas, despesas);
