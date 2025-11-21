@@ -1,5 +1,5 @@
 // Configuração base da aplicação
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://financaspessoaisfrontend.onrender.com';
 
 // Função para obter token de autenticação
 const getAuthToken = () => {
