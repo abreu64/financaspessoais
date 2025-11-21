@@ -1,4 +1,4 @@
-// Gerenciamento de Despesas
+// Gerenciamento de Despesas - CORRIGIDO
 class Despesas {
   static currentData = [];
 
@@ -16,7 +16,8 @@ class Despesas {
       if (dataInicio) queryString += `&data_inicio=${dataInicio}`;
       if (dataFim) queryString += `&data_fim=${dataFim}`;
       
-      const data = await Utils.apiCall(`/despesas?${queryString}`);
+      // CORREÇÃO: Adicionar /api na URL
+      const data = await Utils.apiCall(`/api/despesas?${queryString}`);
       console.log('Despesas carregadas:', data);
       this.currentData = Array.isArray(data) ? data : [];
       this.renderTable(this.currentData);
@@ -111,7 +112,8 @@ class Despesas {
     }
 
     try {
-      await Utils.apiCall('/despesas', {
+      // CORREÇÃO: Adicionar /api na URL
+      await Utils.apiCall('/api/despesas', {
         method: 'POST',
         body: JSON.stringify(data)
       });
@@ -158,7 +160,8 @@ class Despesas {
 
   static async carregarCartoes(cartaoSelecionado = null) {
     try {
-      const data = await Utils.apiCall('/cartoes');
+      // CORREÇÃO: Adicionar /api na URL
+      const data = await Utils.apiCall('/api/cartoes');
       const selectCartao = document.querySelector('select[name="cartao_id"]');
       
       if (selectCartao && data) {
@@ -184,7 +187,8 @@ class Despesas {
     data.parcelas = parseInt(data.parcelas) || 1;
 
     try {
-      await Utils.apiCall(`/despesas/${id}`, {
+      // CORREÇÃO: Adicionar /api na URL
+      await Utils.apiCall(`/api/despesas/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
       });
@@ -209,7 +213,8 @@ class Despesas {
   static async excluir(id) {
     if (confirm('Tem certeza que deseja excluir esta despesa?')) {
       try {
-        await Utils.apiCall(`/despesas/${id}`, {
+        // CORREÇÃO: Adicionar /api na URL
+        await Utils.apiCall(`/api/despesas/${id}`, {
           method: 'DELETE'
         });
 

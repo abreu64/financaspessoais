@@ -1,11 +1,12 @@
-// Gerenciamento de Cartões
+// Gerenciamento de Cartões - CORRIGIDO
 class Cartoes {
     static currentData = [];
 
     static async loadData() {
         try {
             console.log('💳 CARREGANDO CARTÕES...');
-            const data = await Utils.apiCall('/cartoes');
+            // CORREÇÃO: Adicionar /api na URL
+            const data = await Utils.apiCall('/api/cartoes');
             console.log('✅ CARTÕES CARREGADOS:', data);
             this.currentData = Array.isArray(data) ? data : [];
             this.renderCards(this.currentData);
@@ -190,7 +191,8 @@ class Cartoes {
         try {
             console.log('💾 SALVANDO CARTÃO:', data);
             
-            await Utils.apiCall('/cartoes', {
+            // CORREÇÃO: Adicionar /api na URL
+            await Utils.apiCall('/api/cartoes', {
                 method: 'POST',
                 body: JSON.stringify(data)
             });
@@ -240,7 +242,8 @@ class Cartoes {
         try {
             console.log('🔄 ATUALIZANDO CARTÃO:', id, data);
             
-            await Utils.apiCall(`/cartoes/${id}`, {
+            // CORREÇÃO: Adicionar /api na URL
+            await Utils.apiCall(`/api/cartoes/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(data)
             });
@@ -271,7 +274,8 @@ class Cartoes {
             try {
                 console.log('🗑️  EXCLUINDO CARTÃO:', id);
                 
-                await Utils.apiCall(`/cartoes/${id}`, {
+                // CORREÇÃO: Adicionar /api na URL
+                await Utils.apiCall(`/api/cartoes/${id}`, {
                     method: 'DELETE'
                 });
 

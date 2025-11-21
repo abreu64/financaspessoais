@@ -1,4 +1,4 @@
-// Gerenciamento de Entradas
+// Gerenciamento de Entradas - CORRIGIDO
 class Entradas {
   static currentData = [];
 
@@ -16,7 +16,8 @@ class Entradas {
       if (dataInicio) queryString += `&data_inicio=${dataInicio}`;
       if (dataFim) queryString += `&data_fim=${dataFim}`;
       
-      const data = await Utils.apiCall(`/entradas?${queryString}`);
+      // CORREÇÃO: Adicionar /api na URL
+      const data = await Utils.apiCall(`/api/entradas?${queryString}`);
       console.log('Entradas carregadas:', data);
       this.currentData = Array.isArray(data) ? data : [];
       this.renderTable(this.currentData);
@@ -100,7 +101,8 @@ class Entradas {
     data.valor = parseFloat(data.valor);
 
     try {
-      await Utils.apiCall('/entradas', {
+      // CORREÇÃO: Adicionar /api na URL
+      await Utils.apiCall('/api/entradas', {
         method: 'POST',
         body: JSON.stringify(data)
       });
@@ -143,7 +145,8 @@ class Entradas {
     data.valor = parseFloat(data.valor);
 
     try {
-      await Utils.apiCall(`/entradas/${id}`, {
+      // CORREÇÃO: Adicionar /api na URL
+      await Utils.apiCall(`/api/entradas/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
       });
@@ -168,7 +171,8 @@ class Entradas {
   static async excluir(id) {
     if (confirm('Tem certeza que deseja excluir esta entrada?')) {
       try {
-        await Utils.apiCall(`/entradas/${id}`, {
+        // CORREÇÃO: Adicionar /api na URL
+        await Utils.apiCall(`/api/entradas/${id}`, {
           method: 'DELETE'
         });
 

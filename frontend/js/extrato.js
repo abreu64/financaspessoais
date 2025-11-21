@@ -1,4 +1,4 @@
-// Gerenciamento do Extrato do Cartão
+// Gerenciamento do Extrato do Cartão - CORRIGIDO
 class Extrato {
     static currentCartao = null;
     static currentData = [];
@@ -18,13 +18,15 @@ class Extrato {
             if (dataInicio) queryString += `&data_inicio=${dataInicio}`;
             if (dataFim) queryString += `&data_fim=${dataFim}`;
             
+            // CORREÇÃO: Adicionar /api na URL
             // Carregar extrato
-            const data = await Utils.apiCall(`/extrato/${cartaoId}?${queryString}`);
+            const data = await Utils.apiCall(`/api/extrato/${cartaoId}?${queryString}`);
             console.log('📦 DADOS DO EXTRATO RECEBIDOS:', data);
             this.currentData = Array.isArray(data) ? data : [];
             
+            // CORREÇÃO: Adicionar /api na URL
             // Carregar resumo
-            const resumoData = await Utils.apiCall(`/extrato/${cartaoId}/resumo?${queryString}`);
+            const resumoData = await Utils.apiCall(`/api/extrato/${cartaoId}/resumo?${queryString}`);
             console.log('📊 RESUMO DO EXTRATO:', resumoData);
             this.resumo = resumoData;
             
@@ -176,7 +178,8 @@ class Extrato {
                     console.log('📝 DADOS DA PARCELA:', parcela);
                 }
                 
-                await Utils.apiCall(`/extrato/${id}/pagar`, {
+                // CORREÇÃO: Adicionar /api na URL
+                await Utils.apiCall(`/api/extrato/${id}/pagar`, {
                     method: 'PUT'
                 });
 
@@ -197,7 +200,8 @@ class Extrato {
             try {
                 console.log(`↩️ DESFAZENDO PAGAMENTO DA PARCELA ${id}`);
                 
-                await Utils.apiCall(`/extrato/${id}/desfazer-pagamento`, {
+                // CORREÇÃO: Adicionar /api na URL
+                await Utils.apiCall(`/api/extrato/${id}/desfazer-pagamento`, {
                     method: 'PUT'
                 });
 
@@ -239,7 +243,8 @@ class Extrato {
     static async testarConexao(cartaoId) {
         try {
             console.log('🧪 TESTANDO CONEXÃO COM API...');
-            const response = await Utils.apiCall(`/extrato/${cartaoId}`);
+            // CORREÇÃO: Adicionar /api na URL
+            const response = await Utils.apiCall(`/api/extrato/${cartaoId}`);
             console.log('✅ RESPOSTA DA API:', response);
             return response;
         } catch (error) {
