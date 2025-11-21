@@ -1,5 +1,5 @@
 // Configuração base da aplicação
-const API_BASE_URL = 'https://financaspessoaisfrontend.onrender.com';
+const API_BASE_URL = 'https://financaspessoais-62pd.onrender.com';
 
 // Função para obter token de autenticação
 const getAuthToken = () => {
