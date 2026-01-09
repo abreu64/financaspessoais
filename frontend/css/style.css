@@ -37,9 +37,94 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Navbar Premium Redesign */
+.navbar {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    box-shadow: 0 4px 20px rgba(13, 110, 253, 0.25);
+    padding: 1rem 0;
+}
+
 .navbar-brand {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.5rem;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-brand i {
+    font-size: 1.8rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem !important;
+    border-radius: 50px;
+    /* Pill shape */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-link.active {
+    background-color: #ffffff;
+    color: #0d6efd !important;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.navbar-nav .nav-link.active i {
+    color: #0d6efd;
+}
+
+/* User dropdown enhancement */
+.nav-item.dropdown .nav-link {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-menu {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    margin-top: 10px !important;
+    overflow: hidden;
+}
+
+.dropdown-item {
+    padding: 0.7rem 1.5rem;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: var(--primary-color);
+    padding-left: 1.8rem;
+    /* Slide effect */
+}
+
+/* Mobile Toggler */
+.navbar-toggler {
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
 .table {
