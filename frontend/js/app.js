@@ -143,34 +143,34 @@ class App {
       try {
         console.log('🔐 Verificando autenticação...');
 
-        // Verificar se o token é válido chamando o backend
-        const response = await fetch(`${API_BASE_URL}/api/cartoes`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) {
-          throw new Error('Token inválido ou expirado');
-        }
-
         // Pré-carregar dados do dashboard para evitar tela vazia
         if (this.currentPage === 'dashboard') {
           console.log('⏳ Pré-carregando dados do dashboard...');
-          // Tenta carregar, mas não bloqueia se falhar (o catch do loadData trata)
+          // Tenta carregar. Se der erro 401, o Utils.apiCall vai chamar logout.
+          // Se der outro erro, apenas segue.
           await Dashboard.loadData();
         }
 
-        // Se chegou aqui, o token é válido
+        // Se chegou aqui, o token existe (e se fosse inválido, teria feito logout no apiCall)
         document.getElementById('login-page').classList.remove('active');
-        document.getElementById('login-page').classList.add('d-none'); // Garantir que sumiu
+        document.getElementById('login-page').classList.add('d-none');
         document.getElementById('app-pages').classList.remove('d-none');
 
-        // Se ainda não estiver em nenhuma página, vai para dashboard
         if (this.currentPage === 'dashboard') {
           this.navigateTo('dashboard');
         }
       } catch (error) {
         console.error('❌ Erro na verificação de auth:', error);
-        this.logout();
+
+        // Se ainda temos o token (não houve logout via 401), mostramos o app
+        // Se houve erro de rede, o usuário verá o dashboard vazio ou com erro, mas não volta pro login
+        if (getAuthToken()) {
+          document.getElementById('login-page').classList.remove('active');
+          document.getElementById('login-page').classList.add('d-none');
+          document.getElementById('app-pages').classList.remove('d-none');
+        } else {
+          this.showLogin();
+        }
       }
     } else {
       this.showLogin();
