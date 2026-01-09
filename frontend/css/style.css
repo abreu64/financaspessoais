@@ -218,13 +218,12 @@ body {
 
 /* Toast personalizado elegante */
 /* Toast personalizado elegante */
-.alert.position-fixed {
+/* Toast personalizado elegante SEM Bootstrap conflicts */
+.toast-notification {
     border: none;
     border-radius: 12px;
     background: #ffffff !important;
-    /* Force white background */
     color: #333333 !important;
-    /* Force dark text */
     padding: 1rem 1.25rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     display: flex;
@@ -234,10 +233,13 @@ body {
     animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     z-index: 1060 !important;
     border-left: 6px solid transparent;
+    position: fixed;
+    top: 24px;
+    right: 24px;
 }
 
 /* Modo escuro para toasts */
-[data-bs-theme="dark"] .alert.position-fixed {
+[data-bs-theme="dark"] .toast-notification {
     background: #2d2d2d !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     color: #f1f1f1 !important;
@@ -255,38 +257,38 @@ body {
     }
 }
 
-.alert-success.position-fixed {
+.toast-notification.success {
     border-left-color: var(--success-color);
 }
 
-.alert-success.position-fixed .toast-icon {
+.toast-notification.success .toast-icon {
     color: var(--success-color);
     background: rgba(39, 174, 96, 0.1);
 }
 
-.alert-danger.position-fixed {
+.toast-notification.danger {
     border-left-color: var(--danger-color);
 }
 
-.alert-danger.position-fixed .toast-icon {
+.toast-notification.danger .toast-icon {
     color: var(--danger-color);
     background: rgba(231, 76, 60, 0.1);
 }
 
-.alert-warning.position-fixed {
+.toast-notification.warning {
     border-left-color: var(--warning-color);
 }
 
-.alert-warning.position-fixed .toast-icon {
+.toast-notification.warning .toast-icon {
     color: var(--warning-color);
     background: rgba(243, 156, 18, 0.1);
 }
 
-.alert-info.position-fixed {
+.toast-notification.info {
     border-left-color: var(--info-color);
 }
 
-.alert-info.position-fixed .toast-icon {
+.toast-notification.info .toast-icon {
     color: var(--info-color);
     background: rgba(23, 162, 184, 0.1);
 }
