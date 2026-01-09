@@ -207,8 +207,13 @@ class App {
     localStorage.removeItem('userData');
     localStorage.removeItem('currentCartaoId');
     localStorage.removeItem('currentCartaoNome');
+
     Utils.showToast('Logout realizado com sucesso!', 'info');
-    this.showLogin();
+
+    // Recarregar a página para limpar completamente a memória e o DOM por segurança
+    setTimeout(() => {
+      location.reload();
+    }, 500);
   }
 }
 
