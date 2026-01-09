@@ -44,10 +44,13 @@ class Auth {
       console.log('✅ Login realizado, token salvo');
       Utils.showToast('Login realizado com sucesso!', 'success');
 
-      // CORREÇÃO: Recarregar a página para atualizar o app
-      setTimeout(() => {
+      // CORREÇÃO: Não recarregar a página, apenas atualizar o estado
+      if (typeof app !== 'undefined') {
+        app.checkAuth();
+      } else {
+        // Fallback apenas se app não estiver definido (não deve acontecer)
         location.reload();
-      }, 1000);
+      }
 
       return true;
     } catch (error) {
