@@ -1,6 +1,11 @@
 # Aplicativo de Finanças Pessoais
 
-Sistema completo para controle e gestão de finanças pessoais.
+ 
+Sistema completo para controle e gestão de finanças pessoais.:
+
+Está hospedado no Render:
+Backend como financaspessoais
+frontend como financaspessoaisfrontend
 
 ## Funcionalidades
 
@@ -31,3 +36,6 @@ Sistema completo para controle e gestão de finanças pessoais.
 2. Instale as dependências:
    ```bash
    pip install -r requirements.txt
+
+
+Está hospedado na Render
