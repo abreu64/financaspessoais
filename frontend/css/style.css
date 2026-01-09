@@ -29,12 +29,12 @@ body {
     background-color: var(--bs-card-bg);
     border: 1px solid var(--bs-border-color);
     transition: transform 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .navbar-brand {
@@ -50,11 +50,11 @@ body {
 .table th {
     border-top: none;
     font-weight: 600;
-    background-color: rgba(0,0,0,0.02);
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 [data-bs-theme="dark"] .table th {
-    background-color: rgba(255,255,255,0.05);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .btn {
@@ -67,13 +67,15 @@ body {
     transform: translateY(-1px);
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
     border-radius: 6px;
     border: 1px solid #ced4da;
     transition: all 0.2s ease;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
 }
@@ -96,8 +98,13 @@ body {
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Cards de cartão personalizados */
@@ -121,7 +128,7 @@ body {
     right: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 .card-credit.visa {
@@ -141,7 +148,7 @@ body {
 }
 
 .card-credit .dropdown-menu {
-    background-color: rgba(255,255,255,0.95);
+    background-color: rgba(255, 255, 255, 0.95);
 }
 
 .card-credit .dropdown-item {
@@ -149,7 +156,7 @@ body {
 }
 
 .card-credit .dropdown-item:hover {
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Gráficos responsivos */
@@ -160,7 +167,7 @@ body {
 }
 
 /* Modo escuro personalizado */
-[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+[data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd) {
     --bs-table-accent-bg: rgba(255, 255, 255, 0.05);
     color: var(--bs-table-color);
 }
@@ -194,8 +201,15 @@ body {
 
 /* Animações */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .page {
@@ -203,36 +217,48 @@ body {
 }
 
 /* Toast personalizado elegante */
+/* Toast personalizado elegante */
 .alert.position-fixed {
     border: none;
     border-radius: 12px;
-    background: #ffffff;
+    background: #ffffff !important;
+    /* Force white background */
+    color: #333333 !important;
+    /* Force dark text */
     padding: 1rem 1.25rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     min-width: 320px;
     max-width: 400px;
     animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 1060 !important; /* Acima de modais */
-    border-left: 6px solid transparent; /* Prepare for color */
+    z-index: 1060 !important;
+    border-left: 6px solid transparent;
 }
 
 /* Modo escuro para toasts */
 [data-bs-theme="dark"] .alert.position-fixed {
-    background: #2d2d2d;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    color: #f1f1f1;
+    background: #2d2d2d !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    color: #f1f1f1 !important;
 }
 
 @keyframes slideInRight {
-    from { transform: translateX(120%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .alert-success.position-fixed {
     border-left-color: var(--success-color);
 }
+
 .alert-success.position-fixed .toast-icon {
     color: var(--success-color);
     background: rgba(39, 174, 96, 0.1);
@@ -241,6 +267,7 @@ body {
 .alert-danger.position-fixed {
     border-left-color: var(--danger-color);
 }
+
 .alert-danger.position-fixed .toast-icon {
     color: var(--danger-color);
     background: rgba(231, 76, 60, 0.1);
@@ -249,6 +276,7 @@ body {
 .alert-warning.position-fixed {
     border-left-color: var(--warning-color);
 }
+
 .alert-warning.position-fixed .toast-icon {
     color: var(--warning-color);
     background: rgba(243, 156, 18, 0.1);
@@ -257,6 +285,7 @@ body {
 .alert-info.position-fixed {
     border-left-color: var(--info-color);
 }
+
 .alert-info.position-fixed .toast-icon {
     color: var(--info-color);
     background: rgba(23, 162, 184, 0.1);
@@ -321,31 +350,31 @@ body {
     .container {
         padding: 0 15px;
     }
-    
+
     .card-body {
         padding: 1rem;
     }
-    
+
     .table-responsive {
         font-size: 0.875rem;
     }
-    
+
     .navbar-nav .dropdown-menu {
         position: absolute;
     }
-    
+
     .card-credit {
         min-height: 180px;
     }
-    
+
     .display-6 {
         font-size: 2rem;
     }
-    
+
     h2 {
         font-size: 1.5rem;
     }
-    
+
     h4 {
         font-size: 1.25rem;
     }
@@ -355,11 +384,11 @@ body {
     .navbar-brand {
         font-size: 1.25rem;
     }
-    
+
     .btn-group-sm .btn {
         padding: 0.2rem 0.4rem;
     }
-    
+
     .card-credit {
         min-height: 160px;
     }
@@ -367,18 +396,19 @@ body {
 
 /* Print styles */
 @media print {
+
     .navbar,
     .btn,
     .modal,
     .alert {
         display: none !important;
     }
-    
+
     .card {
         border: 1px solid #000;
         box-shadow: none;
     }
-    
+
     .table {
         color: #000;
     }
