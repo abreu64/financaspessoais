@@ -280,12 +280,35 @@ class Utils {
       toast.remove();
     });
 
+    // Ícones por tipo
+    const icons = {
+      success: 'bi-check-circle-fill',
+      danger: 'bi-exclamation-octagon-fill',
+      warning: 'bi-exclamation-triangle-fill',
+      info: 'bi-info-circle-fill'
+    };
+    const iconClass = icons[type] || icons.info;
+    const titles = {
+      success: 'Sucesso!',
+      danger: 'Erro!',
+      warning: 'Atenção!',
+      info: 'Informação'
+    };
+    const title = titles[type] || 'Informação';
+
     // Criar novo toast
     const toast = document.createElement('div');
-    toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    toast.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+    toast.className = `alert alert-${type} alert-dismissible position-fixed`;
+    toast.style.cssText = 'top: 24px; right: 24px; z-index: 1060;';
+
     toast.innerHTML = `
-      ${message}
+      <div class="toast-icon">
+        <i class="bi ${iconClass}"></i>
+      </div>
+      <div class="toast-content">
+        <div class="fw-bold mb-1">${title}</div>
+        <div class="small opacity-75">${message}</div>
+      </div>
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     document.body.appendChild(toast);
