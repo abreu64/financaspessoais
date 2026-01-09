@@ -15,13 +15,8 @@ class App {
 
   init() {
     this.setupEventListeners();
-    this.checkAuth();
     this.setupDarkMode();
-    
-    // Forçar carregamento inicial do dashboard
-    if (document.getElementById('app-pages').classList.contains('d-none') === false) {
-      this.navigateTo('dashboard');
-    }
+    this.checkAuth();
   }
 
   setupEventListeners() {
@@ -54,12 +49,12 @@ class App {
 
   navigateTo(page) {
     console.log('Navegando para:', page);
-    
+
     // Atualizar navegação
     document.querySelectorAll('.nav-link').forEach(link => {
       link.classList.remove('active');
     });
-    
+
     const activeLink = document.querySelector(`[data-page="${page}"]`);
     if (activeLink) {
       activeLink.classList.add('active');
@@ -99,7 +94,7 @@ class App {
 
   loadPageData(page) {
     console.log('Carregando dados para:', page);
-    switch(page) {
+    switch (page) {
       case 'dashboard':
         Dashboard.loadData();
         break;
@@ -121,16 +116,16 @@ class App {
   carregarExtrato() {
     const cartaoId = localStorage.getItem('currentCartaoId');
     const cartaoNome = localStorage.getItem('currentCartaoNome');
-    
+
     console.log('🔄 Carregando extrato - Cartão ID:', cartaoId, 'Nome:', cartaoNome);
-    
+
     if (cartaoId && cartaoNome) {
       // Atualizar título da página
       const titulo = document.querySelector('#extrato-page h2');
       if (titulo) {
         titulo.innerHTML = `<i class="bi bi-receipt"></i> Extrato - ${cartaoNome}`;
       }
-      
+
       // Carregar extrato
       console.log('📋 Iniciando carregamento do extrato...');
       Extrato.carregarExtrato(cartaoId);
@@ -142,16 +137,50 @@ class App {
     }
   }
 
-  checkAuth() {
+  async checkAuth() {
     const token = getAuthToken();
     if (token) {
-      document.getElementById('login-page').classList.remove('active');
-      document.getElementById('app-pages').classList.remove('d-none');
-      this.navigateTo('dashboard');
+      try {
+        console.log('🔐 Verificando autenticação...');
+
+        // Verificar se o token é válido chamando o backend
+        const response = await fetch(`${API_BASE_URL}/api/cartoes`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+          throw new Error('Token inválido ou expirado');
+        }
+
+        // Pré-carregar dados do dashboard para evitar tela vazia
+        if (this.currentPage === 'dashboard') {
+          console.log('⏳ Pré-carregando dados do dashboard...');
+          // Tenta carregar, mas não bloqueia se falhar (o catch do loadData trata)
+          await Dashboard.loadData();
+        }
+
+        // Se chegou aqui, o token é válido
+        document.getElementById('login-page').classList.remove('active');
+        document.getElementById('login-page').classList.add('d-none'); // Garantir que sumiu
+        document.getElementById('app-pages').classList.remove('d-none');
+
+        // Se ainda não estiver em nenhuma página, vai para dashboard
+        if (this.currentPage === 'dashboard') {
+          this.navigateTo('dashboard');
+        }
+      } catch (error) {
+        console.error('❌ Erro na verificação de auth:', error);
+        this.logout();
+      }
     } else {
-      document.getElementById('login-page').classList.add('active');
-      document.getElementById('app-pages').classList.add('d-none');
+      this.showLogin();
     }
+  }
+
+  showLogin() {
+    document.getElementById('login-page').classList.add('active');
+    document.getElementById('login-page').classList.remove('d-none'); // Garantir que aparece
+    document.getElementById('app-pages').classList.add('d-none');
   }
 
   setupDarkMode() {
@@ -179,7 +208,7 @@ class App {
     localStorage.removeItem('currentCartaoId');
     localStorage.removeItem('currentCartaoNome');
     Utils.showToast('Logout realizado com sucesso!', 'info');
-    this.checkAuth();
+    this.showLogin();
   }
 }
 

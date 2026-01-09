@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -16,14 +17,14 @@ console.log('✅ Supabase conectado!');
 
 // Middleware CORS CONFIGURADO CORRETAMENTE
 app.use(cors({
-    origin: [
-        "https://financaspessoaisfrontend.onrender.com",
-        "http://localhost:3000",
-        "http://127.0.0.1:5500"
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: [
+    "https://financaspessoaisfrontend.onrender.com",
+    "http://localhost:3000",
+    "http://127.0.0.1:5500"
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
@@ -31,20 +32,20 @@ app.use(express.json());
 // Middleware de autenticação
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader) {
     return res.status(401).json({ error: 'Token de acesso necessário' });
   }
 
   const token = authHeader.replace('Bearer ', '');
-  
+
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
-    
+
     if (error || !user) {
       return res.status(401).json({ error: 'Token inválido ou expirado' });
     }
-    
+
     req.user = user;
     next();
   } catch (error) {
@@ -63,7 +64,7 @@ function criarDataComFusoHorario(dataString) {
 app.get('/api/test-db', async (req, res) => {
   try {
     console.log('🧪 TESTANDO TABELAS...');
-    
+
     const tabelas = ['usuarios', 'entradas', 'despesas', 'cartoes', 'extrato_cartao'];
     const resultados = {};
 
@@ -79,7 +80,7 @@ app.get('/api/test-db', async (req, res) => {
         erro: error?.message,
         estrutura: data && data.length > 0 ? Object.keys(data[0]) : []
       };
-      
+
       console.log(`📊 ${tabela}: ${data ? data.length : 0} registros`);
       if (error) console.log(`   Erro: ${error.message}`);
     }
@@ -99,7 +100,7 @@ app.post('/api/register', async (req, res) => {
   try {
     const { email, password, nome } = req.body;
     console.log('📝 REGISTRANDO USUÁRIO:', email);
-    
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -130,9 +131,9 @@ app.post('/api/register', async (req, res) => {
       }
     }
 
-    res.json({ 
-      message: 'Usuário criado com sucesso!', 
-      user: data.user 
+    res.json({
+      message: 'Usuário criado com sucesso!',
+      user: data.user
     });
   } catch (error) {
     console.log('❌ Erro registro:', error.message);
@@ -144,7 +145,7 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log('🔐 LOGIN:', email);
-    
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -153,10 +154,10 @@ app.post('/api/login', async (req, res) => {
     if (error) throw error;
 
     console.log('✅ Login realizado. UUID:', data.user.id);
-    res.json({ 
-      message: 'Login realizado com sucesso!', 
+    res.json({
+      message: 'Login realizado com sucesso!',
       user: data.user,
-      session: data.session 
+      session: data.session
     });
   } catch (error) {
     console.log('❌ Erro login:', error.message);
@@ -169,7 +170,7 @@ app.get('/api/dashboard', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const { periodo, data_inicio, data_fim } = req.query;
-    
+
     console.log('📊 DASHBOARD - UUID:', userId, 'Filtros:', { periodo, data_inicio, data_fim });
 
     // Buscar entradas com filtros
@@ -188,30 +189,30 @@ app.get('/api/dashboard', authenticateToken, async (req, res) => {
     if (data_inicio && data_fim) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       const dataFimCorrigida = criarDataComFusoHorario(data_fim);
-      
+
       console.log('🕐 Datas corrigidas - Início:', dataInicioCorrigida.toISOString().split('T')[0], 'Fim:', dataFimCorrigida.toISOString().split('T')[0]);
-      
+
       queryEntradas = queryEntradas.gte('data_entrada', dataInicioCorrigida.toISOString().split('T')[0])
-                                 .lte('data_entrada', dataFimCorrigida.toISOString().split('T')[0]);
+        .lte('data_entrada', dataFimCorrigida.toISOString().split('T')[0]);
       queryDespesas = queryDespesas.gte('data_despesa', dataInicioCorrigida.toISOString().split('T')[0])
-                                  .lte('data_despesa', dataFimCorrigida.toISOString().split('T')[0]);
+        .lte('data_despesa', dataFimCorrigida.toISOString().split('T')[0]);
     } else if (data_inicio) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       console.log('🕐 Data início corrigida:', dataInicioCorrigida.toISOString().split('T')[0]);
-      
+
       queryEntradas = queryEntradas.gte('data_entrada', dataInicioCorrigida.toISOString().split('T')[0]);
       queryDespesas = queryDespesas.gte('data_despesa', dataInicioCorrigida.toISOString().split('T')[0]);
     } else if (data_fim) {
       const dataFimCorrigida = criarDataComFusoHorario(data_fim);
       console.log('🕐 Data fim corrigida:', dataFimCorrigida.toISOString().split('T')[0]);
-      
+
       queryEntradas = queryEntradas.lte('data_entrada', dataFimCorrigida.toISOString().split('T')[0]);
       queryDespesas = queryDespesas.lte('data_despesa', dataFimCorrigida.toISOString().split('T')[0]);
     } else {
       // Filtro por período padrão se não houver datas específicas
       let startDate, endDate;
       const now = new Date();
-      
+
       switch (periodo) {
         case 'hoje':
           startDate = new Date(now.setHours(0, 0, 0, 0));
@@ -236,11 +237,11 @@ app.get('/api/dashboard', authenticateToken, async (req, res) => {
 
       if (startDate && endDate) {
         console.log('📅 Período padrão - Início:', startDate.toISOString().split('T')[0], 'Fim:', endDate.toISOString().split('T')[0]);
-        
+
         queryEntradas = queryEntradas.gte('data_entrada', startDate.toISOString().split('T')[0])
-                                   .lte('data_entrada', endDate.toISOString().split('T')[0]);
+          .lte('data_entrada', endDate.toISOString().split('T')[0]);
         queryDespesas = queryDespesas.gte('data_despesa', startDate.toISOString().split('T')[0])
-                                    .lte('data_despesa', endDate.toISOString().split('T')[0]);
+          .lte('data_despesa', endDate.toISOString().split('T')[0]);
       }
     }
 
@@ -297,7 +298,7 @@ app.get('/api/entradas', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const { periodo, data_inicio, data_fim } = req.query;
-    
+
     console.log(`📥 Buscando entradas - UUID: ${userId}, Filtros:`, { periodo, data_inicio, data_fim });
 
     let query = supabase
@@ -309,9 +310,9 @@ app.get('/api/entradas', authenticateToken, async (req, res) => {
     if (data_inicio && data_fim) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       const dataFimCorrigida = criarDataComFusoHorario(data_fim);
-      
+
       query = query.gte('data_entrada', dataInicioCorrigida.toISOString().split('T')[0])
-                   .lte('data_entrada', dataFimCorrigida.toISOString().split('T')[0]);
+        .lte('data_entrada', dataFimCorrigida.toISOString().split('T')[0]);
     } else if (data_inicio) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       query = query.gte('data_entrada', dataInicioCorrigida.toISOString().split('T')[0]);
@@ -322,7 +323,7 @@ app.get('/api/entradas', authenticateToken, async (req, res) => {
       // Filtro por período padrão se não houver datas específicas
       let startDate, endDate;
       const now = new Date();
-      
+
       switch (periodo) {
         case 'hoje':
           startDate = new Date(now.setHours(0, 0, 0, 0));
@@ -347,7 +348,7 @@ app.get('/api/entradas', authenticateToken, async (req, res) => {
 
       if (startDate && endDate) {
         query = query.gte('data_entrada', startDate.toISOString().split('T')[0])
-                   .lte('data_entrada', endDate.toISOString().split('T')[0]);
+          .lte('data_entrada', endDate.toISOString().split('T')[0]);
       }
     }
 
@@ -368,8 +369,8 @@ app.get('/api/entradas', authenticateToken, async (req, res) => {
 
 app.post('/api/entradas', authenticateToken, async (req, res) => {
   try {
-    const entrada = { 
-      ...req.body, 
+    const entrada = {
+      ...req.body,
       usuario_id: req.user.id
     };
 
@@ -435,7 +436,7 @@ app.get('/api/despesas', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const { periodo, data_inicio, data_fim } = req.query;
-    
+
     console.log(`📤 Buscando despesas - UUID: ${userId}, Filtros:`, { periodo, data_inicio, data_fim });
 
     let query = supabase
@@ -447,9 +448,9 @@ app.get('/api/despesas', authenticateToken, async (req, res) => {
     if (data_inicio && data_fim) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       const dataFimCorrigida = criarDataComFusoHorario(data_fim);
-      
+
       query = query.gte('data_despesa', dataInicioCorrigida.toISOString().split('T')[0])
-                   .lte('data_despesa', dataFimCorrigida.toISOString().split('T')[0]);
+        .lte('data_despesa', dataFimCorrigida.toISOString().split('T')[0]);
     } else if (data_inicio) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       query = query.gte('data_despesa', dataInicioCorrigida.toISOString().split('T')[0]);
@@ -460,7 +461,7 @@ app.get('/api/despesas', authenticateToken, async (req, res) => {
       // Filtro por período padrão se não houver datas específicas
       let startDate, endDate;
       const now = new Date();
-      
+
       switch (periodo) {
         case 'hoje':
           startDate = new Date(now.setHours(0, 0, 0, 0));
@@ -485,7 +486,7 @@ app.get('/api/despesas', authenticateToken, async (req, res) => {
 
       if (startDate && endDate) {
         query = query.gte('data_despesa', startDate.toISOString().split('T')[0])
-                   .lte('data_despesa', endDate.toISOString().split('T')[0]);
+          .lte('data_despesa', endDate.toISOString().split('T')[0]);
       }
     }
 
@@ -506,8 +507,8 @@ app.get('/api/despesas', authenticateToken, async (req, res) => {
 
 app.post('/api/despesas', authenticateToken, async (req, res) => {
   try {
-    const despesa = { 
-      ...req.body, 
+    const despesa = {
+      ...req.body,
       usuario_id: req.user.id
     };
 
@@ -525,7 +526,7 @@ app.post('/api/despesas', authenticateToken, async (req, res) => {
 
       // Criar parcelas no extrato
       await criarParcelasExtrato(despesaSalva[0], req.user.id);
-      
+
       res.status(201).json(despesaSalva[0]);
     } else {
       // Despesa à vista ou sem parcelamento
@@ -569,7 +570,7 @@ async function criarParcelasExtrato(despesa, userId) {
     };
 
     const { error } = await supabase.from('extrato_cartao').insert([parcela]);
-    
+
     if (error) {
       console.log(`❌ Erro ao criar parcela ${i + 1}:`, error.message);
     } else {
@@ -642,8 +643,8 @@ app.get('/api/cartoes', authenticateToken, async (req, res) => {
 
 app.post('/api/cartoes', authenticateToken, async (req, res) => {
   try {
-    const cartao = { 
-      ...req.body, 
+    const cartao = {
+      ...req.body,
       usuario_id: req.user.id
     };
 
@@ -725,9 +726,9 @@ app.get('/api/extrato/:cartaoId', authenticateToken, async (req, res) => {
     if (data_inicio && data_fim) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       const dataFimCorrigida = criarDataComFusoHorario(data_fim);
-      
+
       query = query.gte('data_vencimento', dataInicioCorrigida.toISOString().split('T')[0])
-                   .lte('data_vencimento', dataFimCorrigida.toISOString().split('T')[0]);
+        .lte('data_vencimento', dataFimCorrigida.toISOString().split('T')[0]);
     } else if (data_inicio) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       query = query.gte('data_vencimento', dataInicioCorrigida.toISOString().split('T')[0]);
@@ -770,9 +771,9 @@ app.get('/api/extrato/:cartaoId/resumo', authenticateToken, async (req, res) => 
     if (data_inicio && data_fim) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       const dataFimCorrigida = criarDataComFusoHorario(data_fim);
-      
+
       query = query.gte('data_vencimento', dataInicioCorrigida.toISOString().split('T')[0])
-                   .lte('data_vencimento', dataFimCorrigida.toISOString().split('T')[0]);
+        .lte('data_vencimento', dataFimCorrigida.toISOString().split('T')[0]);
     } else if (data_inicio) {
       const dataInicioCorrigida = criarDataComFusoHorario(data_inicio);
       query = query.gte('data_vencimento', dataInicioCorrigida.toISOString().split('T')[0]);
@@ -818,8 +819,8 @@ app.put('/api/extrato/:id/pagar', authenticateToken, async (req, res) => {
 
     const { data, error } = await supabase
       .from('extrato_cartao')
-      .update({ 
-        pago: true, 
+      .update({
+        pago: true,
         data_pagamento: new Date().toISOString().split('T')[0],
         updated_at: new Date().toISOString()
       })
@@ -850,8 +851,8 @@ app.put('/api/extrato/:id/desfazer-pagamento', authenticateToken, async (req, re
 
     const { data, error } = await supabase
       .from('extrato_cartao')
-      .update({ 
-        pago: false, 
+      .update({
+        pago: false,
         data_pagamento: null,
         updated_at: new Date().toISOString()
       })
@@ -874,11 +875,19 @@ app.put('/api/extrato/:id/desfazer-pagamento', authenticateToken, async (req, re
 
 // Rota de health
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'Backend funcionando!',
     timestamp: new Date().toISOString()
   });
+});
+
+// Servir arquivos estáticos do frontend
+app.use(express.static(path.join(__dirname, '../frontendfinacaspessoais/frontend')));
+
+// Rota catch-all para servir o index.html para qualquer outra rota (suporte a SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontendfinacaspessoais/frontend/index.html'));
 });
 
 app.listen(PORT, () => {
