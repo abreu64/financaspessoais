@@ -3,7 +3,7 @@ class Auth {
   static async login(email, password) {
     try {
       console.log('🔐 Tentando login para:', email);
-      
+
       // CORREÇÃO: Adicionar /api na URL
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
@@ -40,15 +40,15 @@ class Auth {
       // Salvar token e dados do usuário
       localStorage.setItem('authToken', data.session.access_token);
       localStorage.setItem('userData', JSON.stringify(data.user));
-      
+
       console.log('✅ Login realizado, token salvo');
       Utils.showToast('Login realizado com sucesso!', 'success');
-      
+
       // CORREÇÃO: Recarregar a página para atualizar o app
       setTimeout(() => {
         location.reload();
       }, 1000);
-      
+
       return true;
     } catch (error) {
       console.error('❌ Erro no login:', error);
@@ -60,7 +60,7 @@ class Auth {
   static async register(email, password, nome) {
     try {
       console.log('📝 Tentando registrar:', email, nome);
-      
+
       // CORREÇÃO: Adicionar /api na URL
       const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
@@ -92,19 +92,24 @@ class Auth {
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
+    // Limpar formulário ao carregar a página para evitar autofill indesejado após logout
+    loginForm.reset();
+    document.getElementById('email').value = '';
+    document.getElementById('password').value = '';
+
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      
+
       const loginButton = loginForm.querySelector('button[type="submit"]');
       const originalText = loginButton.innerHTML;
       loginButton.innerHTML = '<i class="bi bi-arrow-repeat spinner"></i> Entrando...';
       loginButton.disabled = true;
 
       const success = await Auth.login(email, password);
-      
+
       loginButton.innerHTML = originalText;
       loginButton.disabled = false;
 
@@ -119,13 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (criarContaLink) {
     criarContaLink.addEventListener('click', (e) => {
       e.preventDefault();
-      
+
       const nome = prompt('Digite seu nome completo:');
       if (!nome) return;
-      
+
       const email = prompt('Digite seu e-mail:');
       if (!email) return;
-      
+
       const password = prompt('Digite sua senha (mínimo 6 caracteres):');
       if (!password || password.length < 6) {
         alert('A senha deve ter pelo menos 6 caracteres!');
