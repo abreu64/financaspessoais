@@ -276,7 +276,7 @@ class Utils {
 
   static showToast(message, type = 'info') {
     // Remover toasts antigos
-    document.querySelectorAll('.alert.position-fixed').forEach(toast => {
+    document.querySelectorAll('.toast-notification').forEach(toast => {
       toast.remove();
     });
 
@@ -296,10 +296,11 @@ class Utils {
     };
     const title = titles[type] || 'Informação';
 
-    // Criar novo toast
+    // Criar novo toast usando classe customizada
     const toast = document.createElement('div');
-    toast.className = `alert alert-${type} alert-dismissible position-fixed`;
-    toast.style.cssText = 'top: 24px; right: 24px; z-index: 1060;';
+    toast.className = `toast-notification ${type}`;
+    // Usar estilo inline para garantir remoção de qualquer margem do bootstrap caso vaze
+    toast.style.margin = '0';
 
     toast.innerHTML = `
       <div class="toast-icon">
@@ -309,8 +310,14 @@ class Utils {
         <div class="fw-bold mb-1">${title}</div>
         <div class="small opacity-75">${message}</div>
       </div>
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <button type="button" class="btn-close" aria-label="Close"></button>
     `;
+
+    // Adicionar evento de fechar manual
+    toast.querySelector('.btn-close').addEventListener('click', () => {
+      toast.remove();
+    });
+
     document.body.appendChild(toast);
 
     setTimeout(() => {
