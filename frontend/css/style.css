@@ -328,18 +328,77 @@ body {
     color: var(--bs-body-color);
 }
 
-/* Modal improvements */
+/* Modal improvements - PREMIUM REDESIGN */
 .modal-content {
-    background-color: var(--bs-card-bg);
-    color: var(--bs-body-color);
+    background-color: #ffffff !important;
+    /* Always white in light mode */
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden;
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: #2d2d2d !important;
+    border: 1px solid #444;
 }
 
 .modal-header {
-    border-bottom-color: var(--bs-border-color);
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+}
+
+[data-bs-theme="dark"] .modal-header {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-title {
+    font-weight: 700;
+    color: var(--bs-body-color);
+    letter-spacing: -0.5px;
+}
+
+.modal-body {
+    padding: 1.5rem;
 }
 
 .modal-footer {
-    border-top-color: var(--bs-border-color);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+    background-color: transparent;
+}
+
+[data-bs-theme="dark"] .modal-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Form controls inside modals */
+.modal .form-control,
+.modal .form-select {
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    transition: all 0.2s;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus {
+    background-color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+[data-bs-theme="dark"] .modal .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: #444;
+}
+
+[data-bs-theme="dark"] .modal .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* Table actions */
