@@ -154,6 +154,9 @@ class App {
         // Se chegou aqui, o token existe (e se fosse inválido, teria feito logout no apiCall)
         document.getElementById('login-page').classList.remove('active');
         document.getElementById('login-page').classList.add('d-none');
+
+        // Mostrar Navbar e Apps
+        document.getElementById('mainNavbar').classList.remove('d-none');
         document.getElementById('app-pages').classList.remove('d-none');
 
         if (this.currentPage === 'dashboard') {
@@ -167,6 +170,9 @@ class App {
         if (getAuthToken()) {
           document.getElementById('login-page').classList.remove('active');
           document.getElementById('login-page').classList.add('d-none');
+
+          // Mostrar Navbar e Apps se tiver token (modo offline/erro rede)
+          document.getElementById('mainNavbar').classList.remove('d-none');
           document.getElementById('app-pages').classList.remove('d-none');
         } else {
           this.showLogin();
@@ -180,6 +186,9 @@ class App {
   showLogin() {
     document.getElementById('login-page').classList.add('active');
     document.getElementById('login-page').classList.remove('d-none'); // Garantir que aparece
+
+    // Esconder Navbar e Apps
+    document.getElementById('mainNavbar').classList.add('d-none');
     document.getElementById('app-pages').classList.add('d-none');
   }
 
