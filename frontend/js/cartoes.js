@@ -58,7 +58,7 @@ class Cartoes {
     static createCardHTML(cartao) {
         const bandeiraClass = this.getBandeiraClass(cartao.bandeira);
         const bandeiraLabel = this.getBandeiraLabel(cartao.bandeira);
-        
+
         return `
             <div class="card card-credit ${bandeiraClass}">
                 <div class="card-body">
@@ -145,28 +145,28 @@ class Cartoes {
 
     static verExtrato(cartaoId, cartaoNome) {
         console.log('🔍 ABRINDO EXTRATO DO CARTÃO:', cartaoId, cartaoNome);
-        
+
         // Salvar informações do cartão selecionado
-        localStorage.setItem('currentCartaoId', cartaoId);
-        localStorage.setItem('currentCartaoNome', cartaoNome);
-        
-        console.log('💾 DADOS SALVOS NO LOCALSTORAGE:', {
-            cartaoId: localStorage.getItem('currentCartaoId'),
-            cartaoNome: localStorage.getItem('currentCartaoNome')
+        sessionStorage.setItem('currentCartaoId', cartaoId);
+        sessionStorage.setItem('currentCartaoNome', cartaoNome);
+
+        console.log('💾 DADOS SALVOS NO SESSIONSTORAGE:', {
+            cartaoId: sessionStorage.getItem('currentCartaoId'),
+            cartaoNome: sessionStorage.getItem('currentCartaoNome')
         });
-        
+
         // Navegar para a página de extrato
         app.navigateTo('extrato');
     }
 
     static async testarExtrato(cartaoId, cartaoNome) {
         console.log('🧪 TESTANDO EXTRATO DO CARTÃO:', cartaoId, cartaoNome);
-        
+
         try {
             Utils.showToast('🧪 Testando conexão com extrato...', 'info');
-            
+
             const resultado = await Extrato.testarConexao(cartaoId);
-            
+
             if (resultado && Array.isArray(resultado)) {
                 Utils.showToast(`✅ Teste OK! ${resultado.length} parcelas encontradas`, 'success');
                 console.log('📊 RESULTADO DO TESTE:', resultado);
@@ -190,7 +190,7 @@ class Cartoes {
 
         try {
             console.log('💾 SALVANDO CARTÃO:', data);
-            
+
             // CORREÇÃO: Adicionar /api na URL
             await Utils.apiCall('/api/cartoes', {
                 method: 'POST',
@@ -198,13 +198,13 @@ class Cartoes {
             });
 
             Utils.showToast('✅ Cartão salvo com sucesso!', 'success');
-            
+
             const modal = bootstrap.Modal.getInstance(document.getElementById('modalCartao'));
             if (modal) modal.hide();
-            
+
             form.reset();
             await this.loadData(); // Recarregar a lista
-            
+
         } catch (error) {
             console.error('❌ ERRO AO SALVAR CARTÃO:', error);
             Utils.showToast('❌ Erro ao salvar cartão: ' + error.message, 'danger');
@@ -215,7 +215,7 @@ class Cartoes {
         const cartao = this.currentData.find(c => c.id === id);
         if (cartao) {
             console.log('✏️  EDITANDO CARTÃO:', cartao);
-            
+
             const form = document.getElementById('formCartao');
             Object.keys(cartao).forEach(key => {
                 if (form.elements[key]) {
@@ -241,7 +241,7 @@ class Cartoes {
 
         try {
             console.log('🔄 ATUALIZANDO CARTÃO:', id, data);
-            
+
             // CORREÇÃO: Adicionar /api na URL
             await Utils.apiCall(`/api/cartoes/${id}`, {
                 method: 'PUT',
@@ -249,17 +249,17 @@ class Cartoes {
             });
 
             Utils.showToast('✅ Cartão atualizado com sucesso!', 'success');
-            
+
             const modal = bootstrap.Modal.getInstance(document.getElementById('modalCartao'));
             if (modal) modal.hide();
-            
+
             form.reset();
             await this.loadData();
-            
+
             // Restaurar comportamento padrão do botão
             const salvarBtn = document.getElementById('salvarCartao');
             salvarBtn.onclick = () => this.salvar();
-            
+
         } catch (error) {
             console.error('❌ ERRO AO ATUALIZAR CARTÃO:', error);
             Utils.showToast('❌ Erro ao atualizar cartão: ' + error.message, 'danger');
@@ -273,7 +273,7 @@ class Cartoes {
         if (confirm(`Tem certeza que deseja excluir o cartão "${cartao.nome}"?\n\nEsta ação não pode ser desfeita.`)) {
             try {
                 console.log('🗑️  EXCLUINDO CARTÃO:', id);
-                
+
                 // CORREÇÃO: Adicionar /api na URL
                 await Utils.apiCall(`/api/cartoes/${id}`, {
                     method: 'DELETE'
@@ -281,7 +281,7 @@ class Cartoes {
 
                 Utils.showToast('✅ Cartão excluído com sucesso!', 'success');
                 await this.loadData();
-                
+
             } catch (error) {
                 console.error('❌ ERRO AO EXCLUIR CARTÃO:', error);
                 Utils.showToast('❌ Erro ao excluir cartão: ' + error.message, 'danger');
@@ -293,7 +293,7 @@ class Cartoes {
 // Event listeners para cartões
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🔧 CARTÕES.JS CARREGADO - PRONTO PARA USO!');
-    
+
     const salvarBtn = document.getElementById('salvarCartao');
     if (salvarBtn) {
         salvarBtn.addEventListener('click', () => {
@@ -309,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
                 console.log('🧹 FORMULÁRIO LIMPO APÓS FECHAR MODAL');
             }
-            
+
             const salvarBtn = document.getElementById('salvarCartao');
             if (salvarBtn) {
                 salvarBtn.onclick = () => Cartoes.salvar();

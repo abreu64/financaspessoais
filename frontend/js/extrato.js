@@ -8,36 +8,36 @@ class Extrato {
         try {
             console.log('📋 CARREGANDO EXTRATO DO CARTÃO:', cartaoId);
             this.currentCartao = cartaoId;
-            
+
             // Obter filtros de data
             const dataInicio = document.getElementById('filtroDataInicioExtrato')?.value || '';
             const dataFim = document.getElementById('filtroDataFimExtrato')?.value || '';
-            
+
             // Construir query string
             let queryString = '';
             if (dataInicio) queryString += `&data_inicio=${dataInicio}`;
             if (dataFim) queryString += `&data_fim=${dataFim}`;
-            
+
             // CORREÇÃO: Adicionar /api na URL
             // Carregar extrato
             const data = await Utils.apiCall(`/api/extrato/${cartaoId}?${queryString}`);
             console.log('📦 DADOS DO EXTRATO RECEBIDOS:', data);
             this.currentData = Array.isArray(data) ? data : [];
-            
+
             // CORREÇÃO: Adicionar /api na URL
             // Carregar resumo
             const resumoData = await Utils.apiCall(`/api/extrato/${cartaoId}/resumo?${queryString}`);
             console.log('📊 RESUMO DO EXTRATO:', resumoData);
             this.resumo = resumoData;
-            
+
             this.renderExtrato();
             this.renderResumo();
-            
+
             // Mostrar alerta se não há dados
             if (this.currentData.length === 0) {
                 console.log('⚠️  NENHUMA PARCELA ENCONTRADA PARA ESTE CARTÃO');
             }
-            
+
         } catch (error) {
             console.error('❌ ERRO AO CARREGAR EXTRATO:', error);
             this.currentData = [];
@@ -79,7 +79,7 @@ class Extrato {
             const statusText = parcela.pago ? 'Pago' : 'Pendente';
             const dataPagamento = parcela.data_pagamento ? Utils.formatDate(parcela.data_pagamento) : '-';
             const vencimentoClass = this.isVencida(parcela.data_vencimento) && !parcela.pago ? 'text-danger fw-bold' : '';
-            
+
             row.innerHTML = `
                 <td class="${vencimentoClass}">${Utils.formatDate(parcela.data_vencimento)}</td>
                 <td>${parcela.descricao || 'Sem descrição'}</td>
@@ -172,22 +172,22 @@ class Extrato {
         if (confirm('Deseja marcar esta parcela como paga?\n\nEsta ação registrará a data atual como data de pagamento.')) {
             try {
                 console.log(`💳 MARCANDO PARCELA ${id} COMO PAGA`);
-                
+
                 const parcela = this.currentData.find(p => p.id === id);
                 if (parcela) {
                     console.log('📝 DADOS DA PARCELA:', parcela);
                 }
-                
+
                 // CORREÇÃO: Adicionar /api na URL
                 await Utils.apiCall(`/api/extrato/${id}/pagar`, {
                     method: 'PUT'
                 });
 
                 Utils.showToast('✅ Parcela marcada como paga com sucesso!', 'success');
-                
+
                 // Recarregar os dados
                 await this.carregarExtrato(this.currentCartao);
-                
+
             } catch (error) {
                 console.error('❌ ERRO AO MARCAR PARCELA COMO PAGA:', error);
                 Utils.showToast('❌ Erro ao marcar parcela como paga: ' + error.message, 'danger');
@@ -199,17 +199,17 @@ class Extrato {
         if (confirm('Deseja desfazer o pagamento desta parcela?\n\nEsta ação removerá a data de pagamento.')) {
             try {
                 console.log(`↩️ DESFAZENDO PAGAMENTO DA PARCELA ${id}`);
-                
+
                 // CORREÇÃO: Adicionar /api na URL
                 await Utils.apiCall(`/api/extrato/${id}/desfazer-pagamento`, {
                     method: 'PUT'
                 });
 
                 Utils.showToast('↩️ Pagamento desfeito com sucesso!', 'warning');
-                
+
                 // Recarregar os dados
                 await this.carregarExtrato(this.currentCartao);
-                
+
             } catch (error) {
                 console.error('❌ ERRO AO DESFAZER PAGAMENTO:', error);
                 Utils.showToast('❌ Erro ao desfazer pagamento: ' + error.message, 'danger');
@@ -219,11 +219,11 @@ class Extrato {
 
     static voltarParaCartoes() {
         console.log('🔙 VOLTANDO PARA PÁGINA DE CARTÕES');
-        
+
         // Limpar dados do cartão atual
-        localStorage.removeItem('currentCartaoId');
-        localStorage.removeItem('currentCartaoNome');
-        
+        sessionStorage.removeItem('currentCartaoId');
+        sessionStorage.removeItem('currentCartaoNome');
+
         app.navigateTo('cartoes');
     }
 
@@ -257,11 +257,11 @@ class Extrato {
 // Event listener para carregar extrato quando a página for aberta
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🔧 EXTRATO.JS CARREGADO - PRONTO PARA USO!');
-    
+
     // Event listeners para filtros de data
     const filtroDataInicio = document.getElementById('filtroDataInicioExtrato');
     const filtroDataFim = document.getElementById('filtroDataFimExtrato');
-    
+
     if (filtroDataInicio) {
         filtroDataInicio.addEventListener('change', () => {
             if (Extrato.currentCartao) {
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     if (filtroDataFim) {
         filtroDataFim.addEventListener('change', () => {
             if (Extrato.currentCartao) {
@@ -289,15 +289,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Verificar se estamos na página de extrato
     const isExtratoPage = document.getElementById('extrato-page');
     if (isExtratoPage && !isExtratoPage.classList.contains('d-none')) {
-        const cartaoId = localStorage.getItem('currentCartaoId');
-        const cartaoNome = localStorage.getItem('currentCartaoNome');
-        
+        const cartaoId = sessionStorage.getItem('currentCartaoId');
+        const cartaoNome = sessionStorage.getItem('currentCartaoNome');
+
         console.log('🔄 PÁGINA DE EXTRATO DETECTADA:', {
             cartaoId: cartaoId,
             cartaoNome: cartaoNome,
             paginaVisivel: !isExtratoPage.classList.contains('d-none')
         });
-        
+
         if (cartaoId) {
             console.log('🚀 INICIANDO CARREGAMENTO AUTOMÁTICO DO EXTRATO');
             Extrato.carregarExtrato(cartaoId);
