@@ -3,7 +3,7 @@ const API_BASE_URL = 'https://financaspessoais-62pd.onrender.com';
 
 // Função para obter token de autenticação
 const getAuthToken = () => {
-  return localStorage.getItem('authToken');
+  return sessionStorage.getItem('authToken');
 };
 
 // Gerenciamento de páginas
@@ -114,8 +114,8 @@ class App {
   }
 
   carregarExtrato() {
-    const cartaoId = localStorage.getItem('currentCartaoId');
-    const cartaoNome = localStorage.getItem('currentCartaoNome');
+    const cartaoId = sessionStorage.getItem('currentCartaoId');
+    const cartaoNome = sessionStorage.getItem('currentCartaoNome');
 
     console.log('🔄 Carregando extrato - Cartão ID:', cartaoId, 'Nome:', cartaoNome);
 
@@ -203,10 +203,10 @@ class App {
   }
 
   logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('currentCartaoId');
-    localStorage.removeItem('currentCartaoNome');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userData');
+    sessionStorage.removeItem('currentCartaoId');
+    sessionStorage.removeItem('currentCartaoNome');
 
     Utils.showToast('Logout realizado com sucesso!', 'info');
 

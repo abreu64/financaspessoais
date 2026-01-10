@@ -38,8 +38,8 @@ class Auth {
       }
 
       // Salvar token e dados do usuário
-      localStorage.setItem('authToken', data.session.access_token);
-      localStorage.setItem('userData', JSON.stringify(data.user));
+      sessionStorage.setItem('authToken', data.session.access_token);
+      sessionStorage.setItem('userData', JSON.stringify(data.user));
 
       console.log('✅ Login realizado, token salvo');
       Utils.showToast('Login realizado com sucesso!', 'success');
