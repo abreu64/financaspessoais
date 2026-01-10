@@ -137,27 +137,37 @@ class App {
     }
   }
 
+  updateUIState(isAuthenticated) {
+    const loginPage = document.getElementById('login-page');
+    const mainNavbar = document.getElementById('mainNavbar');
+    const appPages = document.getElementById('app-pages');
+
+    if (isAuthenticated) {
+      loginPage.classList.add('d-none');
+      loginPage.classList.remove('active');
+      mainNavbar.classList.remove('d-none');
+      appPages.classList.remove('d-none');
+    } else {
+      loginPage.classList.remove('d-none');
+      loginPage.classList.add('active');
+      mainNavbar.classList.add('d-none');
+      appPages.classList.add('d-none');
+    }
+  }
+
   async checkAuth() {
     const token = getAuthToken();
     if (token) {
       try {
         console.log('🔐 Verificando autenticação...');
 
-        // Pré-carregar dados do dashboard para evitar tela vazia
+        // Se estivermos no dashboard, carregar dados
         if (this.currentPage === 'dashboard') {
-          console.log('⏳ Pré-carregando dados do dashboard...');
-          // Tenta carregar. Se der erro 401, o Utils.apiCall vai chamar logout.
-          // Se der outro erro, apenas segue.
           await Dashboard.loadData();
         }
 
-        // Se chegou aqui, o token existe (e se fosse inválido, teria feito logout no apiCall)
-        document.getElementById('login-page').classList.remove('active');
-        document.getElementById('login-page').classList.add('d-none');
-
-        // Mostrar Navbar e Apps
-        document.getElementById('mainNavbar').classList.remove('d-none');
-        document.getElementById('app-pages').classList.remove('d-none');
+        // Atualizar UI para logado
+        this.updateUIState(true);
 
         if (this.currentPage === 'dashboard') {
           this.navigateTo('dashboard');
@@ -165,15 +175,10 @@ class App {
       } catch (error) {
         console.error('❌ Erro na verificação de auth:', error);
 
-        // Se ainda temos o token (não houve logout via 401), mostramos o app
-        // Se houve erro de rede, o usuário verá o dashboard vazio ou com erro, mas não volta pro login
+        // Se ainda temos o token no storage, permitimos ver o app (modo offline resiliente)
+        // Se o erro for 401, o apiCall já terá chamado logout()
         if (getAuthToken()) {
-          document.getElementById('login-page').classList.remove('active');
-          document.getElementById('login-page').classList.add('d-none');
-
-          // Mostrar Navbar e Apps se tiver token (modo offline/erro rede)
-          document.getElementById('mainNavbar').classList.remove('d-none');
-          document.getElementById('app-pages').classList.remove('d-none');
+          this.updateUIState(true);
         } else {
           this.showLogin();
         }
@@ -184,12 +189,7 @@ class App {
   }
 
   showLogin() {
-    document.getElementById('login-page').classList.add('active');
-    document.getElementById('login-page').classList.remove('d-none'); // Garantir que aparece
-
-    // Esconder Navbar e Apps
-    document.getElementById('mainNavbar').classList.add('d-none');
-    document.getElementById('app-pages').classList.add('d-none');
+    this.updateUIState(false);
   }
 
   setupDarkMode() {

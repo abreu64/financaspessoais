@@ -67,34 +67,6 @@ class Cartoes {
                             <h5 class="card-title mb-1">${cartao.nome}</h5>
                             <small class="opacity-75">${bandeiraLabel}</small>
                         </div>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-light opacity-75" type="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-three-dots"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="#" onclick="Cartoes.verExtrato(${cartao.id}, '${cartao.nome}')">
-                                        <i class="bi bi-receipt"></i> Ver Extrato
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#" onclick="Cartoes.testarExtrato(${cartao.id}, '${cartao.nome}')">
-                                        <i class="bi bi-bug"></i> Testar Extrato
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="#" onclick="Cartoes.editar(${cartao.id})">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-danger" href="#" onclick="Cartoes.excluir(${cartao.id})">
-                                        <i class="bi bi-trash"></i> Excluir
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -102,7 +74,7 @@ class Cartoes {
                         <div class="h4 mb-1">${Utils.formatCurrency(cartao.limite)}</div>
                     </div>
                     
-                    <div class="row text-center">
+                    <div class="row text-center mb-1">
                         <div class="col-6">
                             <small class="opacity-75">Fechamento</small>
                             <div class="fw-bold">Dia ${cartao.data_fechamento}</div>
@@ -113,10 +85,33 @@ class Cartoes {
                         </div>
                     </div>
                     
-                    <div class="mt-3">
-                        <button class="btn btn-outline-light btn-sm w-100" onclick="Cartoes.verExtrato(${cartao.id}, '${cartao.nome}')">
-                            <i class="bi bi-receipt"></i> Ver Extrato Completo
+                    <div class="mt-4 dropdown">
+                        <button class="btn btn-outline-light w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-list-check"></i> Opções do Cartão
                         </button>
+                        <ul class="dropdown-menu w-100 shadow">
+                            <li>
+                                <a class="dropdown-item py-2" href="#" onclick="Cartoes.verExtrato(${cartao.id}, '${cartao.nome}')">
+                                    <i class="bi bi-receipt text-primary me-2"></i> <strong>Ver Extrato Completo</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="#" onclick="Cartoes.testarExtrato(${cartao.id}, '${cartao.nome}')">
+                                    <i class="bi bi-bug text-info me-2"></i> Testar Conexão
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item py-2" href="#" onclick="Cartoes.editar(${cartao.id})">
+                                    <i class="bi bi-pencil text-warning me-2"></i> Editar Cartão
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 text-danger" href="#" onclick="Cartoes.excluir(${cartao.id})">
+                                    <i class="bi bi-trash me-2"></i> Excluir Cartão
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
