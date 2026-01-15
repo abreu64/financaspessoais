@@ -101,12 +101,12 @@ app.post('/api/register', async (req, res) => {
     const { email, password, nome } = req.body;
     console.log('📝 REGISTRANDO USUÁRIO:', email);
 
-    const { data, error } = await supabase.auth.signUp({
+    // CORREÇÃO: Usar admin.createUser para confirmar e-mail automaticamente
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
-      options: {
-        data: { nome, full_name: nome }
-      }
+      email_confirm: true,
+      user_metadata: { nome, full_name: nome }
     });
 
     if (error) throw error;
