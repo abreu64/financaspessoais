@@ -46,4 +46,4 @@ credentials.json
 # Build/compilação
 dist/
 build/
-*.exe
+*.exe"backend/.env" 
