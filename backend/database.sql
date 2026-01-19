@@ -1,10 +1,13 @@
 -- Tabela de usuários
 CREATE TABLE usuarios (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY, -- Alterado para UUID para compatibilidade com Supabase Auth
     email VARCHAR(255) UNIQUE NOT NULL,
-    senha VARCHAR(255) NOT NULL,
     nome VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    stripe_customer_id VARCHAR(100),
+    subscription_status VARCHAR(50) DEFAULT 'trialing',
+    subscription_id VARCHAR(100),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Tabela de entradas

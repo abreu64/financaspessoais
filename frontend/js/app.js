@@ -1,5 +1,5 @@
 // Configuração base da aplicação
-const API_BASE_URL = 'https://financaspessoais-62pd.onrender.com';
+const API_BASE_URL = 'http://localhost:5000';
 
 // Função para obter token de autenticação
 const getAuthToken = () => {
@@ -72,6 +72,20 @@ class App {
       }
     }
 
+    // Verificação de Assinatura (Gateway)
+    const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+    const isSubscribed = ['active', 'trialing'].includes(userData.subscription_status);
+
+    // Lista de páginas que requerem assinatura
+    const restrictedPages = ['dashboard', 'entradas', 'despesas', 'cartoes', 'extrato'];
+
+    if (restrictedPages.includes(page) && !isSubscribed) {
+      console.log('🚫 Acesso negado: Assinatura necessária');
+      Utils.showToast('Você precisa de uma assinatura ativa para acessar esta área.', 'warning');
+      this.navigateTo('assinatura');
+      return;
+    }
+
     // Esconder todas as páginas
     document.querySelectorAll('.page').forEach(pageElement => {
       pageElement.classList.add('d-none');
@@ -97,6 +111,9 @@ class App {
     switch (page) {
       case 'dashboard':
         Dashboard.loadData();
+        if (typeof StripeManager !== 'undefined') {
+          StripeManager.updateUI();
+        }
         break;
       case 'entradas':
         Entradas.loadData();
@@ -109,6 +126,11 @@ class App {
         break;
       case 'extrato':
         this.carregarExtrato();
+        break;
+      case 'assinatura':
+        if (typeof StripeManager !== 'undefined') {
+          StripeManager.updateUI();
+        }
         break;
     }
   }
@@ -147,6 +169,21 @@ class App {
       loginPage.classList.remove('active');
       mainNavbar.classList.remove('d-none');
       appPages.classList.remove('d-none');
+
+      // Controlar links da Navbar com base na assinatura
+      const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+      const isSubscribed = ['active', 'trialing'].includes(userData.subscription_status);
+
+      const navLinks = document.querySelectorAll('.nav-link[data-page]:not([data-page="assinatura"])');
+      navLinks.forEach(link => {
+        if (!isSubscribed) {
+          link.classList.add('disabled', 'opacity-50');
+          link.style.pointerEvents = 'none';
+        } else {
+          link.classList.remove('disabled', 'opacity-50');
+          link.style.pointerEvents = 'auto';
+        }
+      });
     } else {
       loginPage.classList.remove('d-none');
       loginPage.classList.add('active');
@@ -169,7 +206,12 @@ class App {
         // Atualizar UI para logado
         this.updateUIState(true);
 
-        if (this.currentPage === 'dashboard') {
+        const userData = JSON.parse(sessionStorage.getItem('userData') || '{}');
+        const isSubscribed = ['active', 'trialing'].includes(userData.subscription_status);
+
+        if (!isSubscribed) {
+          this.navigateTo('assinatura');
+        } else if (this.currentPage === 'dashboard' || this.currentPage === 'assinatura') {
           this.navigateTo('dashboard');
         }
       } catch (error) {

@@ -2,13 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
+const stripeController = require('./controllers/stripeController');
+const stripeService = require('./services/stripeService');
 
 const app = express();
 const PORT = 5000;
 
 // Configuração do Supabase
-const SUPABASE_URL = 'https://xqcwlxyflniaptjqwdwr.supabase.co';
-const SUPABASE_ANON_KEY = 'REVOGADA_CHAVE_SUPABASE';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 console.log('🚀 INICIANDO SERVIDOR...');
 
@@ -26,6 +29,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Stripe Webhook (MUST be before express.json())
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeController.webhook);
 
 app.use(express.json());
 
@@ -52,6 +58,11 @@ const authenticateToken = async (req, res, next) => {
     return res.status(401).json({ error: 'Erro de autenticação' });
   }
 };
+
+// Stripe Routes
+app.get('/api/stripe/status', authenticateToken, stripeController.getSubscriptionStatus);
+app.post('/api/stripe/create-checkout-session', authenticateToken, stripeController.createCheckoutSession);
+app.post('/api/stripe/create-portal-session', authenticateToken, stripeController.createPortalSession);
 
 // Função para criar datas com fuso horário correto
 function criarDataComFusoHorario(dataString) {
@@ -111,8 +122,12 @@ app.post('/api/register', async (req, res) => {
 
     if (error) throw error;
 
-    // Criar usuário na tabela usuarios COM UUID
+    // Criar usuário na tabela usuarios COM UUID e vincular ao Stripe
     if (data.user) {
+      console.log('💳 Criando cliente no Stripe...');
+      const stripeCustomer = await stripeService.createCustomer(email, nome);
+      console.log('✅ Cliente Stripe criado:', stripeCustomer.id);
+
       const { error: dbError } = await supabase
         .from('usuarios')
         .insert([
@@ -120,14 +135,17 @@ app.post('/api/register', async (req, res) => {
             id: data.user.id, // UUID do Supabase Auth
             email: data.user.email,
             nome: nome,
-            created_at: new Date().toISOString()
+            stripe_customer_id: stripeCustomer.id,
+            subscription_status: 'trialing',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           }
         ]);
 
       if (dbError) {
         console.log('⚠️  Aviso tabela usuarios:', dbError.message);
       } else {
-        console.log('✅ Usuário criado na tabela usuarios com UUID:', data.user.id);
+        console.log('✅ Usuário criado na tabela usuarios com UUID e Stripe ID');
       }
     }
 
@@ -154,9 +172,49 @@ app.post('/api/login', async (req, res) => {
     if (error) throw error;
 
     console.log('✅ Login realizado. UUID:', data.user.id);
+
+    // Buscar dados adicionais do usuário na tabela 'usuarios'
+    let { data: dbUser, error: dbError } = await supabase
+      .from('usuarios')
+      .select('stripe_customer_id, subscription_status, subscription_id')
+      .eq('id', data.user.id)
+      .maybeSingle();
+
+    if (dbError) {
+      console.log('⚠️  Erro ao buscar dados adicionais do usuário:', dbError.message);
+    }
+
+    // Se o usuário não existe no Banco, vamos criar agora (Sync forzado)
+    if (!dbUser) {
+      console.log('🔄 Usuário não encontrado na tabela. Sicronizando agora...');
+      const { data: newUser, error: syncError } = await supabase
+        .from('usuarios')
+        .insert({
+          id: data.user.id,
+          email: data.user.email,
+          nome: data.user.user_metadata?.nome || data.user.email.split('@')[0],
+          subscription_status: 'trialing'
+        })
+        .select()
+        .single();
+
+      if (!syncError) {
+        dbUser = newUser;
+        console.log('✅ Usuário sincronizado com sucesso!');
+      } else {
+        console.log('❌ Erro ao sincronizar usuário:', syncError.message);
+      }
+    }
+
+    // Mesclar dados do Auth com dados do Banco
+    const userWithExtras = {
+      ...data.user,
+      ...(dbUser || { subscription_status: 'trialing' })
+    };
+
     res.json({
       message: 'Login realizado com sucesso!',
-      user: data.user,
+      user: userWithExtras,
       session: data.session
     });
   } catch (error) {
@@ -883,11 +941,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // Servir arquivos estáticos do frontend
-app.use(express.static(path.join(__dirname, '../frontendfinacaspessoais/frontend')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Rota catch-all para servir o index.html para qualquer outra rota (suporte a SPA)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontendfinacaspessoais/frontend/index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 app.listen(PORT, () => {

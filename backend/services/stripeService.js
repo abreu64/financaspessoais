@@ -29,7 +29,7 @@ const stripeService = {
           },
         ],
         subscription_data: {
-            trial_period_days: 7,
+          trial_period_days: 7,
         },
         allow_promotion_codes: true,
         success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
@@ -66,6 +66,33 @@ const stripeService = {
       );
     } catch (error) {
       console.error('Webhook signature verification failed:', error.message);
+      throw error;
+    }
+  },
+
+  // Get Price Info
+  getPriceInfo: async (priceId) => {
+    try {
+      const price = await stripe.prices.retrieve(priceId);
+      return {
+        id: price.id,
+        unit_amount: price.unit_amount,
+        currency: price.currency,
+        recurring: price.recurring
+      };
+    } catch (error) {
+      console.error('Error fetching price info:', error);
+      throw error;
+    }
+  },
+
+  // Get Subscription Info
+  getSubscription: async (subscriptionId) => {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      return subscription;
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
       throw error;
     }
   }
